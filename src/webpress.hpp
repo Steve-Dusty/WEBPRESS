@@ -18,16 +18,61 @@
 * is really the bulk of the library
 * handle so this is fine.
 */
-#define MAX_SOCKETS 2048
 #define NOT_SOCKET -1
 
 using namespace std;
+
+// SOCKET LINKED LIST //
+typedef struct _inRef {
+	int sock;
+
+	// inRef means in inner reference
+	struct _inRef *forward;
+	struct _inRef *backward;
+} sockLink;
+
+sockLink *appendSockLink(sockLink *node) {
+	sockLink *newNode;
+	newNode = (sockLink*)malloc(sizeof(sockLink));
+
+	// append
+	node->forward = newNode;
+	newNode->backward = node;
+
+	newNode->sock = NOT_SOCKET;
+	return newNode;
+}
+
+void removeSockLink(sockLink *node) {
+	// FREE AFTER EVERYTHING
+	
+	// first make the node behind us use the node that is ahead of us
+	node->backward->forward = node->forward;
+
+	// now make the node ahead of us point to the node before us
+	node->forward->backward = node->backward;
+
+	// clean up and delete the node given to us
+	free(node);
+}
+
+// its just to make the syntax feel a little more elegant
+sockLink *nextSockLink(sockLink *node) {
+	return node->forward;
+}
+// SOCKET LINKED LIST //
+
+
 
 class pServer {
 	private:
 		unsigned int sock;
 		struct sockaddr_in sockSettings;
-		int connectedSockets[MAX_SOCKETS] = {NOT_SOCKET};
+		sockLink head = {
+			NOT_SOCKET,
+			NULL,
+			NULL
+		};
 
 
 		thread acceptThread;
@@ -71,6 +116,10 @@ class pServer {
 				socklen_t sockSettingsLen = sizeof(this->sockSettings);
 
 				while (1) {
+					if (this->aThreadStop) {
+						std::terminate();
+					}
+
 					listen(this->sock, 1);
 					int client = accept(
 						this->sock,
@@ -78,7 +127,13 @@ class pServer {
 						&sockSettingsLen
 					);
 
-					// ADD LINKED LIST HERE:
+					sockLink *node = &this->head;
+					while (node->sock == NOT_SOCKET) { // go down linked list
+						node = nextSockLink(node);
+					}
+
+					sockLink *newClient = appendSockLink(node);
+					newClient->sock = client;
 				}
 			});
 			this->messageThread = thread([this]() -> void {
