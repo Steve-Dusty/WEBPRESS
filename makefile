@@ -1,4 +1,4 @@
-compiler = gcc
+compiler = g++
 main = test.cpp
 output = test.o
 args = -Isrc/ -lpthread

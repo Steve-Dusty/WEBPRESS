@@ -4,5 +4,5 @@
 pServer serv(8080);
 
 int main() {
-	printf(":)\n");
+	serv.start();
 }
