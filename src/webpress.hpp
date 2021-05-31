@@ -79,6 +79,7 @@ class pServer {
 
 		thread acceptThread;
 		thread messageThread;
+                bool first = true;
 		bool aThreadStop = false;
 		bool mThreadStop = false;
 
@@ -129,14 +130,18 @@ class pServer {
 					);
 
 					sockLink *node = &this->head;
-					while (node->sock == NOT_SOCKET) { // go down linked list
+					while (node->sock != NOT_SOCKET) { // go down linked list
 						node = nextSockLink(node);
 					}
 
-					printf("BEFORE SIG\n");
-					sockLink *newClient = appendSockLink(node);
-					printf("AFTER SIG\n");
-					newClient->sock = client;
+                                            printf("Before seg\n");
+                                        if (this->first) {
+                                            this->head.sock = client;
+                                            this->first = false;
+                                        } else {
+					    sockLink *newClient = appendSockLink(node);
+					    newClient->sock = client;
+                                        }
 					printf("Recived connection\n");
 				}
 			});
@@ -151,14 +156,13 @@ class pServer {
 					}
 
 					// loop through all clients
-					if (this->head.forward == NULL) {return;}
-					sockLink *node = this->head.forward;
+					sockLink *node = &this->head;
 					while (node->sock != NOT_SOCKET) {
 						char packet[MAX_PACKET_LENGTH];
 						read(
-							node->sock,
-							packet,
-							sizeof(packet)
+						    node->sock,
+						    packet,
+					            sizeof(packet)
 						);
 
 						// TODO process packets for now i'll just print them out
