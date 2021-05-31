@@ -1,9 +1,10 @@
 // SOCKET REQUIREMENTS
 #include <sys/socket.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 ////
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <thread>
 
@@ -19,6 +20,7 @@
 * handle so this is fine.
 */
 #define NOT_SOCKET -1
+#define MAX_PACKET_LENGTH 65535 // default TCP max packet length
 
 using namespace std;
 
@@ -97,7 +99,6 @@ class pServer {
 			sockSettings.sin_port = htons(port);
 			sockSettings.sin_addr.s_addr = INADDR_ANY;
 
-
 			if ((sock = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
 				panic("Could not create socket");
 			}
@@ -132,11 +133,40 @@ class pServer {
 						node = nextSockLink(node);
 					}
 
+					printf("BEFORE SIG\n");
 					sockLink *newClient = appendSockLink(node);
+					printf("AFTER SIG\n");
 					newClient->sock = client;
+					printf("Recived connection\n");
 				}
 			});
+
+
 			this->messageThread = thread([this]() -> void {
+				socklen_t sockSettingsLen = sizeof(this->sockSettings);
+
+				while (1) {
+					if (this->mThreadStop) {
+						std::terminate();
+					}
+
+					// loop through all clients
+					if (this->head.forward == NULL) {return;}
+					sockLink *node = this->head.forward;
+					while (node->sock != NOT_SOCKET) {
+						char packet[MAX_PACKET_LENGTH];
+						read(
+							node->sock,
+							packet,
+							sizeof(packet)
+						);
+
+						// TODO process packets for now i'll just print them out
+						printf("RECV PACKET %s\n", packet);
+
+						node = nextSockLink(node);
+					}
+				}
 			});
 
 			this->acceptThread.join();
