@@ -1,7 +1,7 @@
 compiler = g++
 main = test.cpp
 output = test.o
-args = -Isrc/ -lpthread
+args = -Isrc/ -pthread
 
 
 

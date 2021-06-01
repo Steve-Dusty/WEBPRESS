@@ -167,7 +167,11 @@ class pServer {
                         // TODO process packets for now i'll just print them out
                         printf("RECV PACKET %s\n", packet);
 
-                        node = nextSockLink(node);
+                        if (node->forward == NULL) {
+                            break;
+                        } else {
+                            node = nextSockLink(node);
+                        }
                     }
                 }
             });
