@@ -36,6 +36,8 @@ typedef struct _inRef {
 sockLink *appendSockLink(sockLink *node) {
     sockLink *newNode;
     newNode = (sockLink*)malloc(sizeof(sockLink));
+    newNode->forward = NULL;
+    newNode->backward = NULL;
 
     // append
     node->forward = newNode;
@@ -49,10 +51,14 @@ void removeSockLink(sockLink *node) {
     // FREE AFTER EVERYTHING
 
     // first make the node behind us use the node that is ahead of us
-    node->backward->forward = node->forward;
+    if (node->forward != NULL) {
+        node->backward->forward = node->forward;
+    }
 
     // now make the node ahead of us point to the node before us
-    node->forward->backward = node->backward;
+    if (node->backward != NULL) {
+        node->forward->backward = node->backward;
+    }
 
     // clean up and delete the node given to us
     free(node);
@@ -158,7 +164,7 @@ class pServer {
                     sockLink *node = &this->head;
                     while (node->sock != NOT_SOCKET) {
                         char packet[MAX_PACKET_LENGTH];
-                        read(
+                        isClosed = read(
                             node->sock,
                             packet,
                             sizeof(packet)
