@@ -11,7 +11,6 @@
 #include "proto.hpp"
 #include "press.hpp"
 
-
 /*
  * This file is more of a server file
  * for the server structure. The server
@@ -20,11 +19,9 @@
  */
 #define DEFAULT_PORT 8080
 #define DEFAULT_QUEUE 1
-#define NOT_SOCKET -1
-#define MAX_PACKET_LENGTH 65535 // default TCP max packet length
+#define MAX_PACKET_LENGTH 65535 // TCP max packet length
 
 using namespace std;
-
 
 class pServer {
     private:
