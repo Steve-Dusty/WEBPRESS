@@ -1,3 +1,6 @@
+// IOSTREAM
+#include <iostream>
+
 // SOCKET REQUIREMENTS
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -38,7 +41,7 @@ class pServer {
 
         // FUNCTIONS //
         void panic(const char errMsg[]) {
-            printf("[PSERVER ERR] %s\n", errMsg);
+            cout << "[PSERVER ERR]" << "\n" errMsg;
             exit(-1);
         }
         // FUNCTIONS //
@@ -78,7 +81,7 @@ class pServer {
                     (struct sockaddr*)&this->sockSettings,
                     &sockSettingsLen
                 );
-                printf("Recived connection");
+                cout << "Recived connection";
 
                 char packet[MAX_PACKET_LENGTH];
                 read(
@@ -86,7 +89,7 @@ class pServer {
                     packet,
                     sizeof(packet)
                 );
-                printf("Recived packet %s\n", packet);
+                cout << "Recived packet" << "\n" << packet;
 
                 shutdown(client, SHUT_RDWR); // close the client
             }
