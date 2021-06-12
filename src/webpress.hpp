@@ -1,4 +1,6 @@
 // SOCKET REQUIREMENTS
+
+#include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -38,7 +40,7 @@ class pServer {
 
         // FUNCTIONS //
         void panic(const char errMsg[]) {
-            printf("[PSERVER ERR] %s\n", errMsg);
+            cout << "[PSERVER ERR] %s\n" << errMsg << endl;
             exit(-1);
         }
         // FUNCTIONS //
@@ -78,7 +80,7 @@ class pServer {
                     (struct sockaddr*)&this->sockSettings,
                     &sockSettingsLen
                 );
-                printf("Recived connection");
+                cout << "Recived connection" << endl;
 
                 char packet[MAX_PACKET_LENGTH];
                 read(
@@ -86,7 +88,7 @@ class pServer {
                     packet,
                     sizeof(packet)
                 );
-                printf("Recived packet %s\n", packet);
+                cout << "Recived packet %s\n" << packet << endl;
 
                 shutdown(client, SHUT_RDWR); // close the client
             }
